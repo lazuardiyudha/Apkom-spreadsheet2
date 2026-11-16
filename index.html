@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spreadsheet Interaktif: IF, Sorting, Filtering, Validation, Formatting</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#f4f7f2;--surface:#fff;--ink:#14261f;--mute:#52665c;--grid:#cfd9cd;--head:#e3eee3;--acc:#1b7f4b;--acc2:#5b4bdb;--ok:#bfeccf;--bad:#ffc9d6;--warn:#ffe9a8;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a14;--surface:#15251c;--ink:#e6f0e9;--mute:#9db3a7;--grid:#2c3f34;--head:#1d3226;--acc:#46c27f;--acc2:#9a8dff;--ok:#1e5a37;--bad:#6b2238;--warn:#6b5a1c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1a14;--surface:#15251c;--ink:#e6f0e9;--mute:#9db3a7;--grid:#2c3f34;--head:#1d3226;--acc:#46c27f;--acc2:#9a8dff;--ok:#1e5a37;--bad:#6b2238;--warn:#6b5a1c;color-scheme:dark}
+html{height:auto}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Bricolage Grotesque",system-ui,sans-serif}
+header{padding:18px 16px 0;max-width:900px;margin:auto}
+.fx{display:flex;border:1px solid var(--grid);background:var(--surface);border-radius:6px;overflow:hidden;font:500 13px "JetBrains Mono",monospace}
+.fx b{background:var(--head);padding:6px 12px;font-style:italic;color:var(--acc)}.fx code{padding:6px 10px;overflow:auto;white-space:nowrap}
+h1{font-size:clamp(1.5rem,5vw,2.4rem);line-height:1.1;font-weight:800;margin:16px 0 4px;letter-spacing:-.02em}
+.dos{font-size:.72rem;color:var(--mute);margin:0}
+nav{display:flex;gap:2px;max-width:900px;margin:14px auto 0;padding:0 16px;overflow:auto;border-bottom:2px solid var(--acc)}
+nav button{font:600 .9rem inherit;font-family:inherit;border:1px solid var(--grid);border-bottom:0;background:var(--head);color:var(--ink);padding:8px 16px;border-radius:8px 8px 0 0;cursor:pointer;white-space:nowrap}
+nav button[aria-selected=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+main{max-width:900px;margin:auto;padding:18px 16px 48px}
+section[hidden]{display:none}
+details{background:var(--surface);border:1px solid var(--grid);border-radius:8px;margin:0 0 10px;padding:0 14px}
+summary{cursor:pointer;font-weight:600;padding:12px 0}
+.kasus{background:var(--warn);border-radius:6px;padding:8px 12px;margin:10px 0}
+.fm{display:flex;gap:8px;align-items:center;margin:6px 0;flex-wrap:wrap}
+code,.in{font-family:"JetBrains Mono",monospace;font-size:.82rem}
+.fm code{background:var(--head);padding:3px 8px;border-radius:4px}
+button.b{font:600 .85rem "Bricolage Grotesque",sans-serif;background:var(--acc);color:#fff;border:0;border-radius:6px;padding:7px 12px;cursor:pointer}
+button.b.o{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+.in{width:100%;padding:8px;border:1px solid var(--grid);border-radius:6px;background:var(--surface);color:var(--ink)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.row label{font-size:.85rem}.row .in{width:auto}
+canvas{width:100%;display:block;border-radius:4px}
+.msg{margin:8px 0;font-weight:600}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chips button{font:600 .8rem "Bricolage Grotesque",sans-serif;border:1px solid var(--grid);background:var(--surface);color:var(--ink);border-radius:99px;padding:6px 12px;cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--acc2);color:#fff;border-color:var(--acc2)}
+.card{background:var(--surface);border:1px solid var(--grid);border-radius:8px;padding:14px}
+.opt{display:block;width:100%;text-align:left;font:inherit;background:var(--bg);color:var(--ink);border:1px solid var(--grid);border-radius:8px;padding:10px 12px;margin:6px 0;cursor:pointer}
+.opt.ok{background:var(--ok);border-color:var(--acc)}.opt.bad{background:var(--bad)}
+.fb{padding:10px 12px;border-radius:8px;margin:10px 0}.fb.ok{background:var(--ok)}.fb.bad{background:var(--bad)}
+.pop{position:fixed;left:50%;bottom:20%;font-size:4rem;pointer-events:none;animation:up 1.2s ease-out forwards}
+@keyframes up{from{transform:translate(-50%,0) scale(.5);opacity:1}to{transform:translate(-50%,-160px) scale(1.4);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pop{animation:none;opacity:.9}}
+</style></head><body>
+<header>
+<div class="fx"><b>fx</b><code>=IF(belajar="rajin","Paham spreadsheet","Ulangi materi")</code></div>
+<h1>Spreadsheet Interaktif: IF, Sorting, Filtering, Validation, Formatting</h1>
+<p class="dos">Dosen pengampu: Lazuardi Yudha Pradana, S.Kom., M.Kom.</p>
+</header>
+<nav role="tablist"><button data-t="materi">Materi</button><button data-t="praktikum">Praktikum</button><button data-t="lab">Lab Praktikum</button><button data-t="kuis">Kuis</button></nav>
+<main>
+<section id="materi"><p>Buka tiap topik, baca cara pakainya, lalu tekan tombol <b>Coba</b> untuk menjalankan formula di kanvas praktikum.</p><div id="mat"></div></section>
+<section id="praktikum" hidden>
+<div class="card"><p style="margin-top:0">Ketik formula untuk kolom <b>D (Hasil)</b> pada baris 2. Formula otomatis dihitung untuk semua baris. Rumus yang didukung: IF, AND, OR, NOT, operator <code>= &lt; &gt; &gt;= &lt;= &lt;&gt;</code>, dan <code>&amp;</code>.</p>
+<input id="pf" class="in" aria-label="Formula" value='=IF(B2>=75,"Lulus","Remedial")'>
+<div class="chips" id="pre" style="margin-top:8px"></div>
+<canvas id="cv" aria-label="Kanvas spreadsheet praktikum"></canvas>
+<div class="row"><label>Urutkan UTS <select id="psort" class="in"><option value="">Asli</option><option value="a">Kecil → besar</option><option value="d">Besar → kecil</option></select></label>
+<label>Filter UTS ≥ <input id="pmin" type="number" class="in" value="0" style="width:80px"></label>
+<label><input id="pfmt" type="checkbox"> Format kondisional UTS (&lt;60 merah, ≥85 hijau)</label></div>
+<div class="msg" id="pm"></div></div></section>
+<section id="lab" hidden><div class="chips" id="lc"></div><div class="card" id="lp"></div></section>
+<section id="kuis" hidden><div class="card" id="qb"></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const IF=(c,a,b)=>c?a:(b===undefined?false:b),AND=(...a)=>a.every(Boolean),OR=(...a)=>a.some(Boolean),NOT=x=>!x;
+function calc(f,i,D){let s=f.trim().replace(/^=/,"").replace(/;/g,","),S=[];
+s=s.replace(/"[^"]*"/g,m=>{S.push(m);return "§"+(S.length-1)+"§"});
+s=s.replace(/\b(if|and|or|not)\(/gi,m=>m.toUpperCase()).replace(/<>/g,"!=").replace(/(?<![<>!=])=(?!=)/g,"==").replace(/&/g,"+");
+s=s.replace(/\b([A-D])(\d+)\b/gi,(m,c,n)=>{const d=D[+n-2+i];return d?JSON.stringify(d["ABCD".indexOf(c.toUpperCase())]):"null"});
+s=s.replace(/§(\d+)§/g,(m,k)=>S[k]);
+return new Function("IF","AND","OR","NOT","return "+s)(IF,AND,OR,NOT)}
+function grid(cv,head,rows,fill){const dpr=devicePixelRatio||1,w=cv.clientWidth||340,rh=30,h=rh*(rows.length+1)+2;
+cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+"px";const x=cv.getContext("2d");x.scale(dpr,dpr);
+const css=getComputedStyle(document.documentElement),g=n=>css.getPropertyValue(n).trim(),rn=28,cw=(w-rn)/head.length;
+x.font="600 13px "+getComputedStyle(document.body).fontFamily;x.textBaseline="middle";
+for(let r=0;r<=rows.length;r++)for(let c=-1;c<head.length;c++){const px=c<0?0:rn+c*cw,pw=c<0?rn:cw,py=r*rh;
+let bg=r==0||c<0?g("--head"):g("--surface"),k=r>0&&c>=0&&fill&&fill(r-1,c);if(k)bg=g("--"+k);
+x.fillStyle=bg;x.fillRect(px,py,pw,rh);x.strokeStyle=g("--grid");x.strokeRect(px+.5,py+.5,pw,rh);x.fillStyle=g("--ink");
+const t=c<0?(r?r+1:""):r==0?String.fromCharCode(65+c)+"  "+head[c]:rows[r-1][c];x.fillText(String(t),px+6,py+rh/2,pw-10)}}
+/* MATERI */
+const T=[
+{t:"1. Fungsi IF dasar",d:"IF memilih satu dari dua hasil berdasarkan kondisi benar atau salah.",s:["Klik sel hasil (misalnya D2) lalu ketik =IF(","Isi tiga bagian: kondisi, nilai jika benar, nilai jika salah, dipisah koma (atau titik koma sesuai pengaturan regional)","Tekan Enter, lalu tarik fill handle ke bawah agar formula tersalin"],f:[[`=IF(B2>=75,"Lulus","Remedial")`,"UTS ≥ 75 → Lulus"]],k:"Dosen menentukan status kelulusan 8 mahasiswa dari nilai UTS."},
+{t:"2. IF bertingkat (nested IF)",d:"IF di dalam IF untuk lebih dari dua kemungkinan. Urutkan dari syarat paling ketat.",s:["Tulis IF pertama untuk syarat tertinggi","Pada bagian salah, tulis IF berikutnya","Tutup semua kurung sesuai jumlah IF"],f:[[`=IF(B2>=85,"A",IF(B2>=70,"B",IF(B2>=60,"C","D")))`,"Konversi nilai ke huruf mutu"]],k:"Mengubah nilai UTS menjadi nilai huruf A–D."},
+{t:"3. IF + AND / OR",d:"AND benar jika semua syarat benar. OR benar jika salah satu syarat benar.",s:["Letakkan AND atau OR di bagian kondisi IF","Pisahkan tiap syarat dengan koma"],f:[[`=IF(AND(B2>=70,C2>=70),"Lulus","Remedial")`,"UTS dan UAS harus ≥ 70"],[`=IF(OR(B2>=80,C2>=80),"Bagus","Biasa")`,"Salah satu nilai ≥ 80"]],k:"Lulus hanya jika UTS dan UAS sama-sama minimal 70."},
+{t:"4. IF dengan fungsi lain",d:"Gabungkan IF dengan IFERROR, COUNTIF, dan SUMIF untuk laporan.",s:["IFERROR mengganti pesan error dengan nilai pengganti","COUNTIF menghitung sel yang cocok dengan kriteria","SUMIF menjumlahkan sel yang cocok dengan kriteria"],f:[["=IFERROR(B2/C2,0)","Hindari #DIV/0!",1],[`=COUNTIF(D2:D9,"Lulus")`,"Jumlah mahasiswa lulus",1],[`=SUMIF(D2:D9,"Lulus",B2:B9)`,"Total UTS yang lulus",1]],k:"Rekap berapa mahasiswa lulus dan remedial di bawah tabel."},
+{t:"5. Sorting (pengurutan)",d:"Mengurutkan baris berdasarkan satu atau beberapa kolom.",s:["Klik sel di dalam tabel atau pilih seluruh tabel","Data → Sort, pilih kolom dan urutan (A–Z, Z–A, kecil–besar)","Tambahkan level kedua bila ada nilai yang sama"],f:[],k:"Peringkat mahasiswa dari UTS tertinggi.",go:"praktikum"},
+{t:"6. Filtering (penyaringan)",d:"Menampilkan baris yang sesuai kriteria dan menyembunyikan sisanya tanpa menghapus.",s:["Pilih header tabel","Data → Filter, klik panah di header kolom","Pilih nilai atau atur Number Filters, misalnya Greater Than Or Equal To 75"],f:[],k:"Menampilkan hanya mahasiswa dengan UTS ≥ 75.",go:"praktikum"},
+{t:"7. Data Validation",d:"Membatasi isian sel agar sesuai aturan sehingga data tetap bersih.",s:["Pilih sel atau kolom target","Data → Data Validation, atur Allow (Whole number, List, Date)","Isi batas, pesan input, dan pesan error"],f:[],k:"Kolom nilai hanya menerima bilangan bulat 0–100.",go:"lab"},
+{t:"8. Formatting & Conditional Formatting",d:"Format biasa mengubah tampilan tetap. Conditional Formatting mengubah tampilan otomatis berdasarkan nilai sel.",s:["Pilih rentang nilai","Home → Conditional Formatting → Highlight Cells Rules","Tentukan kondisi (misalnya Less Than 60) dan warna"],f:[],k:"Nilai di bawah KKM otomatis berwarna merah.",go:"praktikum"}];
+$("#mat").innerHTML=T.map((o,i)=>`<details${i?"":" open"}><summary>${o.t}</summary><p>${o.d}</p><ol>${o.s.map(x=>`<li>${x}</li>`).join("")}</ol>${o.f.map(f=>`<div class="fm"><code>${f[0].replace(/</g,"&lt;")}</code><span>${f[1]}</span>${f[2]?"":`<button class="b o" data-f='${f[0]}'>Coba</button>`}</div>`).join("")}<div class="kasus"><b>Studi kasus:</b> ${o.k}</div>${o.go?`<button class="b" data-go="${o.go}">Coba di ${o.go==="lab"?"Lab":"Praktikum"}</button>`:""}<p></p></details>`).join("");
+$("#mat").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.f){$("#pf").value=b.dataset.f;show("praktikum")}else if(b.dataset.go)show(b.dataset.go)};
+/* PRAKTIKUM */
+const D=[["Andi",80,70],["Bela",65,90],["Citra",92,88],["Dimas",55,60],["Eka",75,72],["Fajar",68,74],["Gita",85,95],["Hadi",40,58]];
+const PRE=[`=IF(B2>=75,"Lulus","Remedial")`,`=IF(B2>=85,"A",IF(B2>=70,"B",IF(B2>=60,"C","D")))`,`=IF(AND(B2>=70,C2>=70),"Lulus","Remedial")`,`=IF(OR(B2>=80,C2>=80),"Bagus","Biasa")`];
+$("#pre").innerHTML=PRE.map((p,i)=>`<button data-i="${i}">Contoh ${i+1}</button>`).join("");
+$("#pre").onclick=e=>{const i=e.target.dataset.i;if(i!=null){$("#pf").value=PRE[i];prac()}};
+function prac(){let err=0,m=+$("#pmin").value||0,s=$("#psort").value,fmt=$("#pfmt").checked;
+let rows=D.map((d,i)=>{let h;try{h=calc($("#pf").value,i,D);if(h===undefined||h!==h)throw 0}catch(e){h="#ERR";err++}return[...d,h]}).filter(r=>r[1]>=m);
+if(s)rows.sort((a,b)=>s=="a"?a[1]-b[1]:b[1]-a[1]);
+grid($("#cv"),["Nama","UTS","UAS","Hasil"],rows,(r,c)=>fmt&&c==1?(rows[r][1]<60?"bad":rows[r][1]>=85?"ok":0):0);
+$("#pm").textContent=err?"Formula belum valid: periksa kurung, tanda kutip, dan koma.":"Formula berjalan untuk "+rows.length+" baris."}
+["pf","psort","pmin","pfmt"].forEach(i=>$("#"+i).addEventListener("input",prac));
+/* LAB */
+const L=[
+{t:"IF: Diskon toko",k:"f",task:`Beri “Diskon 10%” jika Belanja ≥ 100000, selain itu “Tanpa Diskon”. Tulis formula untuk C2.`,h:["Pelanggan","Belanja"],d:[["Rina",150000],["Toni",80000],["Sari",100000],["Budi",99000],["Mala",250000]],e:r=>r[1]>=100000?"Diskon 10%":"Tanpa Diskon",hint:`=IF(B2>=100000,"Diskon 10%","Tanpa Diskon")`},
+{t:"IF + AND: Kelulusan",k:"f",task:`Mahasiswa “Lulus” jika Hadir ≥ 75 dan Tugas ≥ 70, selain itu “Tidak”. Tulis formula untuk D2.`,h:["Nama","Hadir","Tugas"],d:[["Ayu",80,75],["Bagas",90,60],["Cici",70,90],["Doni",75,70],["Elok",60,50]],e:r=>r[1]>=75&&r[2]>=70?"Lulus":"Tidak",hint:`=IF(AND(B2>=75,C2>=70),"Lulus","Tidak")`},
+{t:"Nested IF: Grade",k:"f",task:`Nilai ≥ 85 = A, ≥ 70 = B, ≥ 60 = C, selain itu D. Tulis formula untuk C2.`,h:["Nama","Nilai"],d:[["Fina",90],["Gani",72],["Hana",60],["Iwan",45],["Joko",85]],e:r=>r[1]>=85?"A":r[1]>=70?"B":r[1]>=60?"C":"D",hint:`=IF(B2>=85,"A",IF(B2>=70,"B",IF(B2>=60,"C","D")))`},
+{t:"Validation",k:"v",task:"Kolom nilai ujian hanya boleh bilangan bulat 0 sampai 100. Atur aturan agar hanya 85 dan 100 yang diterima dari data uji."},
+{t:"Sort & Filter",k:"s",task:"Tampilkan hanya karyawan Bandung dengan gaji tertinggi di baris paling atas."},
+{t:"Conditional Format",k:"c",task:"Sorot nilai di bawah KKM 70 dengan warna merah. Tentukan batas yang benar."}];
+const VT=[85,105,-5,100,"abc",60.5],SD=[["Rani","Bandung",8],["Dedi","Jakarta",12],["Lia","Bandung",10],["Arif","Jakarta",9],["Mira","Bandung",7]],CD=[["Nia",82],["Oka",65],["Putra",70],["Qori",58],["Raka",90]];
+let lc=0;
+$("#lc").innerHTML=L.map((c,i)=>`<button data-i="${i}">${c.t}</button>`).join("");
+$("#lc").onclick=e=>{const i=e.target.dataset.i;if(i!=null){lc=+i;lab()}};
+function lab(){[...$("#lc").children].forEach((b,i)=>b.setAttribute("aria-pressed",i==lc));const c=L[lc];
+let ctl="";if(c.k=="f")ctl=`<input id="x" class="in" placeholder="=IF(...)" aria-label="Formula jawaban"><p><button class="b o" id="hb">Lihat petunjuk</button> <code id="ht"></code></p>`;
+if(c.k=="v")ctl=`<div class="row"><label>Tipe <select id="vt" class="in"><option value="any">Angka apa saja</option><option value="int">Bilangan bulat</option></select></label><label>Min <input id="vmin" type="number" class="in" value="0" style="width:80px"></label><label>Maks <input id="vmax" type="number" class="in" value="1000" style="width:80px"></label></div>`;
+if(c.k=="s")ctl=`<div class="row"><label>Filter Kota <select id="sf" class="in"><option>Semua</option><option>Bandung</option><option>Jakarta</option></select></label><label>Urutkan Gaji <select id="ss" class="in"><option value="">Asli</option><option value="a">Kecil → besar</option><option value="d">Besar → kecil</option></select></label></div>`;
+if(c.k=="c")ctl=`<div class="row"><label>Sorot jika Nilai &lt; <input id="ct" type="number" class="in" value="50" style="width:90px"></label></div>`;
+$("#lp").innerHTML=`<h3 style="margin-top:0">${c.t}</h3><p>${c.task}</p>${ctl}<canvas id="lcv" aria-label="Kanvas lab"></canvas><p><button class="b" id="ck">Periksa jawaban</button></p><div class="msg" id="lm"></div>`;
+$("#lp").oninput=()=>draw(false);$("#ck").onclick=()=>draw(true);if(c.k=="f")$("#hb").onclick=()=>$("#ht").textContent=c.hint;draw(false)}
+function draw(chk){const c=L[lc],cv=$("#lcv");let ok=0,tot=0,msg="";
+if(c.k=="f"){const f=$("#x").value,rows=c.d.map((d,i)=>{let h;try{h=f?calc(f,i,c.d):"";if(h===undefined||h!==h)throw 0}catch(e){h="#ERR"}return[...d,h]}),n=c.h.length;
+const st=rows.map(r=>r[n]===c.e(r));ok=st.filter(Boolean).length;tot=rows.length;
+grid(cv,[...c.h,"Hasil"],rows,(r,k)=>chk&&k==n?(st[r]?"ok":"bad"):0);msg=ok==tot?"🎉 Semua baris benar!":"Benar "+ok+" dari "+tot+" baris. Cek syarat dan tanda kutip.";}
+if(c.k=="v"){const t=$("#vt").value,a=+$("#vmin").value,b=+$("#vmax").value,res=VT.map(v=>typeof v=="number"&&v>=a&&v<=b&&(t=="any"||Number.isInteger(v)));
+grid(cv,["Nilai uji","Status"],VT.map((v,i)=>[v,res[i]?"Diterima ✓":"Ditolak ✗"]),r=>res[r]?"ok":"bad");
+ok=res.every((x,i)=>x==(i==0||i==3));tot=1;ok=+ok;msg=ok?"🎉 Aturan sudah tepat!":"Aturan belum tepat: hanya 85 dan 100 yang boleh lolos.";}
+if(c.k=="s"){const f=$("#sf").value,s=$("#ss").value;let r=SD.filter(d=>f=="Semua"||d[1]==f);if(s)r=[...r].sort((a,b)=>s=="a"?a[2]-b[2]:b[2]-a[2]);
+grid(cv,["Nama","Kota","Gaji (jt)"],r,0);ok=+(f=="Bandung"&&s=="d");tot=1;msg=ok?"🎉 Filter dan urutan tepat!":"Pilih Kota Bandung dan urutkan gaji besar → kecil.";}
+if(c.k=="c"){const t=+$("#ct").value;grid(cv,["Nama","Nilai"],CD,(r,k)=>k==1&&CD[r][1]<t?"bad":0);ok=+(t==70);tot=1;msg=ok?"🎉 KKM 70 sudah tepat!":"Nilai di bawah KKM 70 yang harus tersorot (Qori dan Oka).";}
+$("#lm").textContent=chk?msg:""}
+/* KUIS */
+const Q=[
+["Format benar fungsi IF adalah…","=IF(kondisi, nilai_jika_benar, nilai_jika_salah)","=IF(nilai_jika_benar, kondisi)","=IF kondisi THEN nilai","=IF(kondisi)","IF membutuhkan tiga argumen berurutan: kondisi, hasil jika benar, hasil jika salah."],
+["=IF(B2>=75,\"Lulus\",\"Remedial\") dengan B2 = 75 menghasilkan…","Lulus","Remedial","#VALUE!","FALSE","Operator >= mencakup nilai yang sama dengan 75, sehingga kondisi benar."],
+["Fungsi yang benar bila SEMUA syarat terpenuhi adalah…","AND","OR","NOT","SUM","AND hanya TRUE jika seluruh syarat TRUE. OR cukup satu syarat."],
+["=IF(OR(A1>5,A1<0),\"X\",\"OK\") dengan A1 = 3 menghasilkan…","OK","X","#VALUE!","TRUE","3 tidak lebih dari 5 dan tidak kurang dari 0, kedua syarat salah, maka hasil bagian salah: OK."],
+["IF yang diletakkan di dalam IF disebut…","Nested IF","Loop IF","Mirror IF","Double IF","Nested IF (IF bertingkat) dipakai untuk lebih dari dua kemungkinan hasil."],
+["Fungsi untuk mengganti pesan error dengan nilai lain adalah…","IFERROR","ERRORIF","TRYIF","CATCH","=IFERROR(rumus, nilai_pengganti) menampilkan nilai pengganti jika rumus error."],
+["Teks di dalam formula ditulis dengan…","Tanda kutip ganda “…”","Kurung siku […]","Tanda pagar #…#","Tanpa tanda apa pun","Teks wajib diapit tanda kutip ganda, kalau tidak dianggap nama fungsi atau sel."],
+["=IF(B2>=85,\"A\",IF(B2>=70,\"B\",\"C\")) dengan B2 = 72 menghasilkan…","B","A","C","#N/A","72 tidak ≥ 85, lalu IF kedua: 72 ≥ 70 maka B."],
+["Fungsi untuk menghitung sel yang cocok dengan satu kriteria adalah…","COUNTIF","SUMIF","COUNTA","LEFT","COUNTIF menghitung jumlah sel yang memenuhi kriteria. SUMIF menjumlahkan nilainya."],
+["Sorting berfungsi untuk…","Mengurutkan data berdasarkan kolom tertentu","Menyembunyikan baris","Menghapus duplikat","Mewarnai sel","Sorting menyusun ulang baris menurut kolom pilihan, naik atau turun."],
+["Hasil sort ascending untuk angka 5, 2, 9 adalah…","2, 5, 9","9, 5, 2","5, 2, 9","2, 9, 5","Ascending berarti dari kecil ke besar."],
+["Agar baris tidak tercerai-berai saat sort, sebaiknya…","Pilih seluruh tabel (semua kolom) sebelum sort","Pilih satu kolom saja","Hapus header","Gabungkan semua sel","Jika hanya satu kolom yang diurutkan, kolom lain tetap sehingga data antarkolom tidak cocok lagi."],
+["Filtering bertujuan untuk…","Menampilkan baris yang memenuhi kriteria","Menghapus baris permanen","Mengurutkan data","Menjumlahkan kolom","Filter hanya menyembunyikan baris yang tidak cocok. Data tetap ada."],
+["Fungsi utama Data Validation adalah…","Membatasi isian sel agar sesuai aturan","Mengubah warna sel","Menghitung rata-rata","Mencetak dokumen","Validation mencegah data salah masuk sejak awal."],
+["Tipe validasi untuk membuat dropdown pilihan adalah…","List","Whole number","Date","Text length","Allow: List menampilkan panah dropdown dengan daftar pilihan."],
+["Agar nilai hanya bilangan bulat 0–100, gunakan…","Whole number between 0 and 100","List 0,100","Text length 100","Any value","Whole number dengan batas minimum 0 dan maksimum 100 menolak desimal dan angka di luar rentang."],
+["Conditional Formatting adalah…","Format yang berubah otomatis sesuai kondisi nilai sel","Format yang tidak bisa diubah","Hanya mengubah ukuran font","Proteksi sheet","Tampilan sel mengikuti aturan, misalnya merah jika nilai < 60."],
+["Untuk menyorot nilai < 60 dengan warna merah gunakan…","Conditional Formatting → Highlight Cells Rules","Merge Cells","Freeze Panes","Sort","Highlight Cells Rules → Less Than cocok untuk menyorot nilai kecil."],
+["Referensi sel yang tetap saat formula disalin adalah…","$A$1","A1","[A1]","@A1","Tanda $ mengunci kolom dan baris (referensi absolut)."],
+["=IF(AND(B2>=70,C2>=70),\"Lulus\",\"Remedial\") dengan B2 = 80, C2 = 65 menghasilkan…","Remedial","Lulus","#VALUE!","80","C2 = 65 tidak ≥ 70, AND menjadi FALSE, maka hasilnya Remedial."]];
+const GOOD=["🔥 Slay banget! +5 poin","😎 Sigma move, no cap! +5 poin","🤩 W banget bestie! +5 poin","💅 Ate and left no crumbs! +5 poin","🥳 Gaskeun, auto pinter! +5 poin","🫶 Pro nih, aura naik! +5 poin"],
+BAD=["😵‍💫 Aduh, belum poin bestie","🥲 Gapapa, next pasti bisa","😭 Salting, jawabannya meleset"],EM=["🔥","😎","🤩","💅","🥳","✨","💯"];
+let qi=0,sc=0,done=0,nm="";const esc=s=>s.replace(/[<>&]/g,"");
+function qn(){const qb=$("#qb");if(!nm){qb.innerHTML=`<h3 style="margin-top:0">Sebelum mulai, isi nama lengkap</h3><label>Nama lengkap<input id="nn" class="in" maxlength="60" autocomplete="name" placeholder="Contoh: Budi Santoso"></label><div class="msg" id="ne"></div><button class="b" id="ns">Mulai kuis</button>`;const go=()=>{const v=$("#nn").value.trim().replace(/\s+/g," ");if(v.length<3){$("#ne").textContent="Nama lengkap minimal 3 karakter.";return}nm=v;qi=sc=0;qn()};$("#ns").onclick=go;$("#nn").onkeydown=e=>{if(e.key=="Enter")go()};return}if(qi>=Q.length){const lv=sc>=90?"🏆 Dewa spreadsheet!":sc>=70?"😎 Keren, hampir sempurna!":sc>=50?"🙂 Lumayan, ayo ulangi materi.":"🥲 Tenang, baca materi lagi lalu coba ulang.";
+qb.innerHTML=`<h2 style="margin-top:0">${esc(nm)}: skor akhir ${sc} / 100</h2><p>${lv}</p><button class="b" id="rs">Ulangi kuis</button> <button class="b o" id="np">Peserta baru</button>`;$("#rs").onclick=()=>{qi=sc=0;qn()};$("#np").onclick=()=>{nm="";qi=sc=0;qn()};return}
+const q=Q[qi],o=[q[1],q[2],q[3],q[4]].sort(()=>Math.random()-.5);done=0;
+qb.innerHTML=`<p class="dos">${esc(nm)} · Soal ${qi+1} dari ${Q.length} · Skor ${sc}</p><h3 style="margin:6px 0">${q[0].replace(/</g,"&lt;")}</h3>${o.map(t=>`<button class="opt">${t}</button>`).join("")}<div id="fb"></div>`;
+qb.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{if(done)return;done=1;const r=b.textContent==q[1];
+qb.querySelectorAll(".opt").forEach(x=>{if(x.textContent==q[1])x.classList.add("ok")});
+if(r){sc+=5;pop();$("#fb").innerHTML=`<div class="fb ok"><b>${GOOD[Math.random()*GOOD.length|0]}</b><br>${q[5]}</div>`}
+else{b.classList.add("bad");$("#fb").innerHTML=`<div class="fb bad"><b>${BAD[Math.random()*BAD.length|0]}</b><br>Jawaban benar: <b>${q[1]}</b><br>${q[5]}</div>`}
+$("#fb").innerHTML+=`<button class="b" id="nx">${qi==Q.length-1?"Lihat skor":"Soal berikutnya"}</button>`;$("#nx").onclick=()=>{qi++;qn()};$("#nx").focus()})}
+function pop(){const s=document.createElement("div");s.className="pop";s.textContent=EM[Math.random()*EM.length|0];s.setAttribute("aria-hidden","true");document.body.appendChild(s);setTimeout(()=>s.remove(),1300)}
+/* NAV */
+function show(t){if(!["materi","praktikum","lab","kuis"].includes(t))t="materi";
+document.querySelectorAll("main>section").forEach(s=>s.hidden=s.id!=t);
+document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t==t));
+try{history.replaceState(null,"","#"+t)}catch(e){}
+if(t=="praktikum")prac();if(t=="lab")lab();window.scrollTo(0,0)}
+document.querySelector("nav").onclick=e=>{if(e.target.dataset.t)show(e.target.dataset.t)};
+addEventListener("hashchange",()=>show(location.hash.slice(1)));
+matchMedia("(prefers-color-scheme:dark)").addEventListener("change",()=>{prac();if(!$("#lab").hidden)lab()});
+qn();show(location.hash.slice(1));
+</script></body></html>
